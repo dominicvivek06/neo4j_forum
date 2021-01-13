@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  neo4j:
+    build: .
+    hostname: neo4j_graphaware
+    container_name: neo4j_graphaware
+    volumes:
+      - ./neo4j/data:/var/lib/neo4j/data
+      - ./neo4j/import:/var/lib/neo4j/import
+    environment:
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+      - "7473:7473"
