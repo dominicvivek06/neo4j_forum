@@ -1,0 +1,113 @@
+version: "3.8"
+
+services:
+  core1:
+    hostname: core1
+    image: neo4j:enterprise
+    networks:
+      - neo4j_cluster_ntx
+    container_name: core1
+    volumes:
+      - ./core1/neo4j/data:/var/lib/neo4j/data
+      - ./core1/neo4j/import:/var/lib/neo4j/import
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4JLABS_PLUGINS=["apoc","graph-data-science"]
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__formation=3
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__runtime=3
+      - NEO4J_causal__clustering_discovery__advertised__address=core1:5000
+      - NEO4J_causal__clustering_transaction__advertised__address=core1:6000
+      - NEO4J_causal__clustering_raft__advertised__address=core1:7000
+      - NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000
+      - NEO4J_causal__clustering_disable__middleware__logging=false
+    ports:
+      - 7474:7474
+      - 6477:6477
+      - 7687:7687
+  core2:
+    hostname: core2
+    image: neo4j:enterprise
+    networks:
+      - neo4j_cluster_ntx
+    container_name: core2
+    volumes:
+      - ./core2/neo4j/data:/var/lib/neo4j/data
+      - ./core2/neo4j/import:/var/lib/neo4j/import
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4JLABS_PLUGINS=["apoc","graph-data-science"]
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__formation=3
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__runtime=3
+      - NEO4J_causal__clustering_discovery__advertised__address=core2:5000
+      - NEO4J_causal__clustering_transaction__advertised__address=core2:6000
+      - NEO4J_causal__clustering_raft__advertised__address=core2:7000
+      - NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000
+      - NEO4J_causal__clustering_disable__middleware__logging=false
+      - NEO4J_dbms_connector_http_listen__address=:7475
+      - NEO4J_dbms_connector_https_listen__address=:6478
+      - NEO4J_dbms_connector_bolt_listen__address=:7688
+    ports:
+      - 7475:7475
+      - 6478:6478
+      - 7688:7688
+  core3:
+    hostname: core3
+    image: neo4j:enterprise
+    networks:
+      - neo4j_cluster_ntx
+    container_name: core3
+    volumes:
+      - ./core3/neo4j/data:/var/lib/neo4j/data
+      - ./core3/neo4j/import:/var/lib/neo4j/import
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4JLABS_PLUGINS=["apoc","graph-data-science"]
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__formation=3
+      - NEO4J_causal__clustering_minimum__core__cluster__size__at__runtime=3
+      - NEO4J_causal__clustering_discovery__advertised__address=core3:5000
+      - NEO4J_causal__clustering_transaction__advertised__address=core3:6000
+      - NEO4J_causal__clustering_raft__advertised__address=core3:7000
+      - NEO4J_causal__clustering_initial__discovery__members=core1:5000,core2:5000,core3:5000
+      - NEO4J_causal__clustering_disable__middleware__logging=false
+      - NEO4J_dbms_connector_http_listen__address=:7476
+      - NEO4J_dbms_connector_https_listen__address=:6479
+      - NEO4J_dbms_connector_bolt_listen__address=:7689
+    ports:
+      - 7476:7476
+      - 6479:6479
+      - 7689:7689
+  portainer:
+    image: portainer/portainer
+    networks:
+      - neo4j_cluster_ntx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./pt-data:/data
+    ports:
+      - "9000:9000"
+networks:
+  neo4j_cluster_ntx:
