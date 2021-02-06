@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  core1:
+    hostname: core1
+    image: neo4j:4.2-enterprise
+    networks:
+      - neo4j_cluster_ntx
+    container_name: core1
+    volumes:
+      - ./neo4j/data:/var/lib/neo4j/data
+      - ./neo4j/import:/var/lib/neo4j/import
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4JLABS_PLUGINS=["apoc","graph-data-science"]
+      - NEO4J_dbms_default__listen__address=0.0.0.0
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+    ports:
+      - 7474:7474
+      - 6477:6477
+      - 7687:7687
+networks:
+  neo4j_cluster_ntx:
